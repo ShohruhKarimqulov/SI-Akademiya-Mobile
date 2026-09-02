@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../design_system/design_system.dart';
-import '../../../shared/widgets/lesson_project_preview_card.dart';
+import 'widgets/course_progress_item.dart';
 
 class PersonalCurriculumScreen extends StatelessWidget {
   const PersonalCurriculumScreen({this.onStartLearning, super.key});
@@ -9,9 +9,9 @@ class PersonalCurriculumScreen extends StatelessWidget {
   final VoidCallback? onStartLearning;
 
   static const _modules = [
-    _CurriculumModuleData(isCurrent: true),
-    _CurriculumModuleData(),
-    _CurriculumModuleData(),
+    CourseModuleData(isCurrent: true),
+    CourseModuleData(),
+    CourseModuleData(),
   ];
 
   @override
@@ -41,7 +41,7 @@ class PersonalCurriculumScreen extends StatelessWidget {
                   itemCount: _modules.length,
                   separatorBuilder: (context, index) =>
                       const SizedBox(height: AppSpacing.controlGap),
-                  itemBuilder: (context, index) => _CurriculumTimelineItem(
+                  itemBuilder: (context, index) => CourseProgressItem(
                     module: _modules[index],
                     showConnector: index < _modules.length - 1,
                   ),
@@ -53,7 +53,9 @@ class PersonalCurriculumScreen extends StatelessWidget {
               right: 0,
               bottom: 0,
               height: 120,
-              child: IgnorePointer(child: _BottomFade()),
+              child: RepaintBoundary(
+                child: IgnorePointer(child: _BottomFade()),
+              ),
             ),
             Positioned(
               left: AppSpacing.screenHorizontal,
@@ -115,133 +117,6 @@ class _CurriculumHeader extends StatelessWidget {
           style: AppTypography.title.copyWith(fontWeight: FontWeight.w600),
         ),
       ],
-    );
-  }
-}
-
-class _CurriculumModuleData {
-  const _CurriculumModuleData({this.isCurrent = false});
-
-  final bool isCurrent;
-}
-
-class _CurriculumTimelineItem extends StatelessWidget {
-  const _CurriculumTimelineItem({
-    required this.module,
-    required this.showConnector,
-  });
-
-  final _CurriculumModuleData module;
-  final bool showConnector;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 235,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 48,
-            height: 235,
-            child: Stack(
-              clipBehavior: Clip.none,
-              alignment: Alignment.topCenter,
-              children: [
-                if (showConnector)
-                  Positioned(
-                    top: 44,
-                    bottom: -AppSpacing.controlGap,
-                    width: 4,
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: module.isCurrent
-                            ? AppColors.primary
-                            : AppColors.outline,
-                        borderRadius: AppRadius.button,
-                      ),
-                    ),
-                  ),
-                _CurriculumTimelineNode(isCurrent: module.isCurrent),
-              ],
-            ),
-          ),
-          const Expanded(child: _CurriculumModuleCard()),
-        ],
-      ),
-    );
-  }
-}
-
-class _CurriculumTimelineNode extends StatelessWidget {
-  const _CurriculumTimelineNode({required this.isCurrent});
-
-  final bool isCurrent;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: const BoxDecoration(
-        color: AppColors.mutedSurface,
-        shape: BoxShape.circle,
-      ),
-      alignment: Alignment.center,
-      child: isCurrent
-          ? Text(
-              '0%',
-              style: AppTypography.caption.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-            )
-          : const Icon(
-              Icons.lock_outline_rounded,
-              size: 19,
-              color: AppColors.textSecondary,
-            ),
-    );
-  }
-}
-
-class _CurriculumModuleCard extends StatelessWidget {
-  const _CurriculumModuleCard();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 235,
-      padding: const EdgeInsets.all(AppSpacing.card),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: AppRadius.lessonCard,
-        border: Border.all(color: AppColors.outline),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '1. Pythonga kirish',
-            style: AppTypography.body.copyWith(
-              fontWeight: FontWeight.w600,
-              height: 22 / 16,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.compact),
-          Text(
-            'Create variables storing numbers,\nstrings and booleans',
-            style: AppTypography.bodySmall.copyWith(height: 22 / 14),
-          ),
-          const SizedBox(height: AppSpacing.controlGap),
-          const Expanded(
-            child: LessonProjectPreviewCard(
-              label: 'Bo’lim loyihasi',
-              title: 'Bot',
-              imagePath: 'assets/images/curriculum/bot_project.png',
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

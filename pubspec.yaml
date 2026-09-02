@@ -20,8 +20,6 @@ flutter:
 
   assets:
     - assets/images/splash/robot.png
-    - assets/images/splash/highlight.png
-    - assets/images/splash/shade.png
     - assets/images/onboarding/learn.png
     - assets/images/onboarding/assistant.png
     - assets/images/onboarding/practice.png
@@ -31,6 +29,15 @@ flutter:
     - assets/images/profile/python_course.png
     - assets/images/profile/study_mascot.png
     - assets/images/curriculum/bot_project.png
+    - assets/images/curriculum/node_trophy.png
+    - assets/images/curriculum/node_robot.png
+    - assets/images/curriculum/node_locked.png
+    - assets/images/learn/map_background.png
+    - assets/images/learn/coin.png
+    - assets/images/learn/key.png
+    - assets/images/learn/fire.png
+    - assets/images/lesson/true_mascot.png
+    - assets/images/lesson/false_mascot.png
     - assets/icons/actions/arrow-right-light@4x.png
     - assets/icons/auth/email.svg
     - assets/icons/auth/password.svg

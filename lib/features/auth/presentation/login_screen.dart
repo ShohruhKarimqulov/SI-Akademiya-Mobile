@@ -25,66 +25,73 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.transparent,
+      color: AppColors.primary,
       child: AppDesignCanvas(
-        child: Stack(
-          clipBehavior: Clip.hardEdge,
-          children: [
-            const AppBrandBackdrop(),
-            const _LoginMascot(),
-            const _GreetingBubble(),
-            const Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              height: 460,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  borderRadius: AppRadius.sheetTop,
-                  boxShadow: AppShadows.elevatedCard,
-                ),
-              ),
-            ),
-            Positioned(
-              left: AppSpacing.screenHorizontal,
-              top: 492,
-              width: 390,
-              child: Column(
-                children: [
-                  const _LoginHeading(),
-                  const SizedBox(height: AppSpacing.section),
-                  _LoginForm(
-                    obscurePassword: _obscurePassword,
-                    onTogglePassword: () {
-                      setState(() => _obscurePassword = !_obscurePassword);
-                    },
-                  ),
-                  const SizedBox(height: AppSpacing.section),
-                  AppButton(
-                    label: 'Kirish',
-                    onPressed: widget.onLogin ?? () {},
-                  ),
-                  const SizedBox(height: AppSpacing.section),
-                  const _AuthDivider(),
-                  const SizedBox(height: AppSpacing.section),
-                  AppButton(
-                    label: 'Google orqali',
-                    onPressed: widget.onGoogleLogin ?? () {},
-                    variant: AppButtonVariant.outlined,
-                    contentGap: 12,
-                    leading: SvgPicture.asset(
-                      'assets/icons/auth/google.svg',
-                      width: 20,
-                      height: 20,
+        keyboardBehavior: AppDesignCanvasKeyboardBehavior.overlay,
+        child: AppKeyboardScrollView(
+          key: const ValueKey('login-page-scroll'),
+          child: SizedBox(
+            height: 932,
+            child: Stack(
+              clipBehavior: Clip.hardEdge,
+              children: [
+                const AppBrandBackdrop(),
+                const _LoginMascot(),
+                const _GreetingBubble(),
+                const Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  height: 460,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: AppColors.surface,
+                      borderRadius: AppRadius.sheetTop,
+                      boxShadow: AppShadows.elevatedCard,
                     ),
                   ),
-                  const SizedBox(height: AppSpacing.section),
-                  _RegisterPrompt(onPressed: widget.onRegister),
-                ],
-              ),
+                ),
+                Positioned(
+                  left: AppSpacing.screenHorizontal,
+                  top: 492,
+                  width: 390,
+                  child: Column(
+                    children: [
+                      const _LoginHeading(),
+                      const SizedBox(height: AppSpacing.section),
+                      _LoginForm(
+                        obscurePassword: _obscurePassword,
+                        onTogglePassword: () {
+                          setState(() => _obscurePassword = !_obscurePassword);
+                        },
+                      ),
+                      const SizedBox(height: AppSpacing.section),
+                      AppButton(
+                        label: 'Kirish',
+                        onPressed: widget.onLogin ?? () {},
+                      ),
+                      const SizedBox(height: AppSpacing.section),
+                      const _AuthDivider(),
+                      const SizedBox(height: AppSpacing.section),
+                      AppButton(
+                        label: 'Google orqali',
+                        onPressed: widget.onGoogleLogin ?? () {},
+                        variant: AppButtonVariant.outlined,
+                        contentGap: 12,
+                        leading: SvgPicture.asset(
+                          'assets/icons/auth/google.svg',
+                          width: 20,
+                          height: 20,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.section),
+                      _RegisterPrompt(onPressed: widget.onRegister),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -105,6 +112,7 @@ class _LoginMascot extends StatelessWidget {
         child: Image.asset(
           'assets/images/auth/login_mascot.png',
           fit: BoxFit.fill,
+          cacheWidth: 600,
         ),
       ),
     );

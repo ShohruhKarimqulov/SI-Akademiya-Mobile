@@ -3,6 +3,7 @@ export 'components/app_bottom_nav_bar.dart';
 export 'components/app_brand_backdrop.dart';
 export 'components/app_choice_card.dart';
 export 'components/app_design_canvas.dart';
+export 'components/app_keyboard_scroll_view.dart';
 export 'components/app_linear_progress_bar.dart';
 export 'components/app_stat_pill.dart';
 export 'components/app_step_progress_indicator.dart';

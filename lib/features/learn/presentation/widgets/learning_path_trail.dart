@@ -1,136 +1,148 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../design_system/design_system.dart';
 import 'learning_path_node.dart';
 
 /// One stop on the [LearningPathTrail].
 class LearningPathStep {
-  const LearningPathStep({required this.state, this.assetPath});
+  const LearningPathStep({
+    required this.state,
+    required this.left,
+    required this.top,
+  });
 
   final LearningPathNodeState state;
-  final String? assetPath;
+  final double left;
+  final double top;
 }
 
-/// Lays the learning path out as the snaking column of isometric tiles from
-/// the Figma frames: nodes step centre → right → centre → left and repeat,
-/// joined by rounded elbow connectors painted behind the tiles.
+/// The Figma map's right-angle connector paths, painted below the exported
+/// node illustrations.
 class LearningPathTrail extends StatelessWidget {
-  const LearningPathTrail({required this.steps, super.key});
+  const LearningPathTrail({
+    required this.steps,
+    required this.height,
+    this.onStepTap,
+    super.key,
+  });
 
   final List<LearningPathStep> steps;
-
-  /// Vertical distance between consecutive node centres.
-  static const _stride = 100.0;
-
-  /// Horizontal centre of each column, as a fraction of the trail width.
-  static const _columns = [0.5, 0.81, 0.5, 0.19];
-
-  static double _columnFraction(int index) => _columns[index % _columns.length];
-
-  double get _height => (steps.length - 1) * _stride + LearningPathNode.height;
-
-  /// A connector is only "lit" once the learner has reached the node it
-  /// leads into; everything past the current lesson stays muted.
-  static Color _connectorColor(LearningPathStep from, LearningPathStep to) =>
-      switch (to.state) {
-        LearningPathNodeState.completed => const Color(0xFF4ECB71),
-        LearningPathNodeState.current => const Color(0xFF5A7BEA),
-        LearningPathNodeState.locked => const Color(0xFFD8DCE2),
-      };
+  final double height;
+  final ValueChanged<int>? onStepTap;
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final width = constraints.maxWidth;
-        final centers = [
-          for (var index = 0; index < steps.length; index++)
-            Offset(
-              width * _columnFraction(index),
-              index * _stride +
-                  LearningPathNode.height -
-                  LearningPathNode.tileHeight / 2,
-            ),
-        ];
-
         return SizedBox(
-          width: width,
-          height: _height,
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              Positioned.fill(
-                child: CustomPaint(
-                  painter: _TrailConnectorPainter(
-                    centers: centers,
-                    colors: [
-                      for (var index = 1; index < steps.length; index++)
-                        _connectorColor(steps[index - 1], steps[index]),
-                    ],
+          height: height,
+          child: RepaintBoundary(
+            child: CustomPaint(
+              painter: _TrailPainter(steps: steps),
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                for (var index = 0; index < steps.length; index++)
+                  Positioned(
+                    left: steps[index].left,
+                    top: steps[index].top,
+                    width: LearningPathNode.width,
+                    height: LearningPathNode.height,
+                    child: LearningPathNode(
+                      state: steps[index].state,
+                      onTap:
+                          onStepTap == null ||
+                              steps[index].state == LearningPathNodeState.locked
+                          ? null
+                          : () => onStepTap!(index),
+                    ),
                   ),
-                ),
-              ),
-              for (var index = 0; index < steps.length; index++)
-                Positioned(
-                  left: centers[index].dx - LearningPathNode.width / 2,
-                  top: index * _stride,
-                  child: LearningPathNode(
-                    state: steps[index].state,
-                    assetPath: steps[index].assetPath,
-                  ),
-                ),
-            ],
+              ],
+            ),
           ),
-        );
-      },
+        ),
+      );
+    },
     );
   }
 }
 
-class _TrailConnectorPainter extends CustomPainter {
-  const _TrailConnectorPainter({required this.centers, required this.colors});
+class _TrailPainter extends CustomPainter {
+  const _TrailPainter({required this.steps});
 
-  final List<Offset> centers;
-  final List<Color> colors;
+  final List<LearningPathStep> steps;
 
   @override
   void paint(Canvas canvas, Size size) {
-    const corner = 20.0;
+    for (var index = 0; index < steps.length - 1; index++) {
+      final from = steps[index];
+      final to = steps[index + 1];
+      final movesLeft = to.left < from.left;
+      final movesRight = to.left > from.left;
+      final start = movesLeft
+          ? Offset(from.left + 12, from.top + LearningPathNode.height - 28)
+          : movesRight
+          ? Offset(
+              from.left + LearningPathNode.width - 12,
+              from.top + LearningPathNode.height - 28,
+            )
+          : Offset(
+              from.left + LearningPathNode.width / 2,
+              from.top + LearningPathNode.height - 13,
+            );
+      final end = Offset(to.left + LearningPathNode.width / 2, to.top + 16);
 
-    for (var index = 1; index < centers.length; index++) {
-      final start = centers[index - 1];
-      final end = centers[index];
       final paint = Paint()
-        ..color = colors[index - 1]
+        ..color = _segmentColor(from.state, to.state)
         ..strokeWidth = 6
         ..strokeCap = StrokeCap.round
         ..strokeJoin = StrokeJoin.round
         ..style = PaintingStyle.stroke;
 
+      const corner = 20.0;
+      final horizontalLength = (end.dx - start.dx).abs();
+      final verticalLength = (end.dy - start.dy).abs();
+      final horizontalDirection = end.dx >= start.dx ? 1.0 : -1.0;
+      final verticalDirection = end.dy >= start.dy ? 1.0 : -1.0;
+      final usableCorner = [
+        corner,
+        verticalLength / 2,
+        horizontalLength / 2,
+      ].reduce((smallest, value) => smallest < value ? smallest : value);
       final path = Path()..moveTo(start.dx, start.dy);
+
       if ((end.dx - start.dx).abs() < 1) {
         path.lineTo(end.dx, end.dy);
       } else {
-        final direction = end.dx > start.dx ? 1.0 : -1.0;
-        final midY = (start.dy + end.dy) / 2;
         path
-          ..lineTo(start.dx, midY - corner)
+          ..lineTo(end.dx - usableCorner * horizontalDirection, start.dy)
           ..quadraticBezierTo(
-            start.dx,
-            midY,
-            start.dx + corner * direction,
-            midY,
+            end.dx,
+            start.dy,
+            end.dx,
+            start.dy + usableCorner * verticalDirection,
           )
-          ..lineTo(end.dx - corner * direction, midY)
-          ..quadraticBezierTo(end.dx, midY, end.dx, midY + corner)
           ..lineTo(end.dx, end.dy);
       }
+
       canvas.drawPath(path, paint);
     }
   }
 
   @override
-  bool shouldRepaint(covariant _TrailConnectorPainter oldDelegate) =>
-      !listEquals(oldDelegate.centers, centers) ||
-      !listEquals(oldDelegate.colors, colors);
+  bool shouldRepaint(covariant _TrailPainter oldDelegate) =>
+      !listEquals(oldDelegate.steps, steps);
+
+  Color _segmentColor(LearningPathNodeState from, LearningPathNodeState to) {
+    if (from == LearningPathNodeState.completed &&
+        to == LearningPathNodeState.completed) {
+      return AppColors.success;
+    }
+    if (from == LearningPathNodeState.current ||
+        to == LearningPathNodeState.current) {
+      return AppColors.primary;
+    }
+    return AppColors.surface.withValues(alpha: 0.9);
+  }
 }

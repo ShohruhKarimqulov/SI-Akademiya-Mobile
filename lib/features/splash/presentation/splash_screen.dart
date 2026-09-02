@@ -42,6 +42,7 @@ class _SplashContent extends StatelessWidget {
           width: 255,
           height: 200,
           fit: BoxFit.cover,
+          cacheWidth: 500,
           semanticLabel: 'SI Akademiyasi robot',
         ),
         const SizedBox(height: AppSpacing.screenHorizontal),

@@ -5,8 +5,9 @@ import '../../../../design_system/design_system.dart';
 /// The white card introducing a module section on the Learn path: category
 /// label, lesson title, and its completion bar.
 ///
-/// Sections the learner has not reached yet render [isLocked], which greys
-/// the copy and empties the bar, matching the second card in the Figma frame.
+/// Figma: auto layout, padding 16, gap 15, radius 16, fill #FFFFFF, 2px
+/// #131316 @10% stroke. Sections the learner has not reached render
+/// [isLocked], which mutes the title and empties the bar.
 class LessonSectionHeaderCard extends StatelessWidget {
   const LessonSectionHeaderCard({
     required this.category,
@@ -25,43 +26,52 @@ class LessonSectionHeaderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.card),
-      decoration: const BoxDecoration(
+    return DecoratedBox(
+      decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: AppRadius.lessonCard,
-        boxShadow: AppShadows.card,
+        borderRadius: AppRadius.card,
+        border: Border.all(color: AppColors.outline, width: 2),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            category,
-            style: AppTypography.bodySmall.copyWith(
-              height: 1.2,
-              color: isLocked
-                  ? AppColors.textDisabled
-                  : AppColors.textSecondary,
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.card),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Opacity(
+              opacity: isLocked ? 0.4 : 1,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    category,
+                    style: AppTypography.label.copyWith(
+                      height: 1.5,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    title,
+                    style: AppTypography.sectionTitle.copyWith(
+                      height: 1.5,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            title,
-            style: AppTypography.sectionTitle.copyWith(
-              height: 1.3,
-              fontWeight: FontWeight.w700,
-              color: isLocked ? AppColors.textDisabled : AppColors.textPrimary,
+            const SizedBox(height: AppSpacing.section),
+            AppLinearProgressBar(
+              value: isLocked ? 0 : progress,
+              height: 12,
+              trackColor: AppColors.outline,
+              fillGradient: const LinearGradient(
+                colors: [AppColors.primarySoft, AppColors.primary],
+              ),
             ),
-          ),
-          const SizedBox(height: 14),
-          AppLinearProgressBar(
-            value: isLocked ? 0 : progress,
-            height: 14,
-            fillGradient: const LinearGradient(
-              colors: [AppColors.primarySoft, AppColors.primary],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

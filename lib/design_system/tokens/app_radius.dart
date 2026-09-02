@@ -7,5 +7,6 @@ abstract final class AppRadius {
   static const lessonCard = BorderRadius.all(Radius.circular(20));
   static const choice = BorderRadius.all(Radius.circular(30));
   static const button = BorderRadius.all(Radius.circular(40));
+  static const modalSheetTop = BorderRadius.vertical(top: Radius.circular(30));
   static const sheetTop = BorderRadius.vertical(top: Radius.circular(50));
 }

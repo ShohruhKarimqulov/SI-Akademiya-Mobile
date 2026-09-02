@@ -37,8 +37,11 @@ class _CreateProfileFlowState extends State<CreateProfileFlow> {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppColors.pageBackground,
+      color: _currentStep >= _questionStepCount
+          ? AppColors.primary
+          : AppColors.pageBackground,
       child: AppDesignCanvas(
+        keyboardBehavior: AppDesignCanvasKeyboardBehavior.overlay,
         child: Stack(
           children: [
             Positioned.fill(
@@ -67,7 +70,7 @@ class _CreateProfileFlowState extends State<CreateProfileFlow> {
                     choices: const [
                       _ProfileChoice('🎒', 'Maktab o’quvchisi'),
                       _ProfileChoice('🎓', 'Talaba'),
-                      _ProfileChoice('🧑🏽‍💼', 'Xodim'),
+                      _ProfileChoice('🧑🏻‍💼', 'Xodim'),
                       _ProfileChoice('💻', 'O’z-o’zini band qilgan shaxs'),
                       _ProfileChoice('🎨', 'Hech biri'),
                     ],
@@ -79,8 +82,8 @@ class _CreateProfileFlowState extends State<CreateProfileFlow> {
                     key: const ValueKey('create-profile-step-3'),
                     title: 'Nimaga Sun’iy intellektni\no’rganmoqchisiz?',
                     choices: const [
-                      _ProfileChoice('🧑‍🤝‍🧑', 'O’z loyihamni qurish uchun'),
-                      _ProfileChoice('🧑‍💻', 'Shu sohada ishlash uchun'),
+                      _ProfileChoice('🧑‍💡', 'O’z loyihamni qurish uchun'),
+                      _ProfileChoice('👩🏻‍💻', 'Shu sohada ishlash uchun'),
                       _ProfileChoice('🚀', 'Chunki, hozir bu zamonaviy kasb'),
                       _ProfileChoice('🎨', 'Shunchaki'),
                     ],
@@ -200,10 +203,18 @@ class _WelcomeStep extends StatelessWidget {
       body: Stack(
         children: [
           const Positioned(
-            left: 95,
-            top: 210,
-            width: 240,
-            height: 250,
+            key: ValueKey('welcome-mascot-glow'),
+            left: 0,
+            right: 0,
+            top: 0,
+            height: 570,
+            child: IgnorePointer(child: _WelcomeMascotGlow()),
+          ),
+          const Positioned(
+            left: 60,
+            top: 175,
+            width: 310,
+            height: 310,
             child: _ProfileIllustration(
               assetPath: 'assets/images/profile/meditation_mascot.png',
               fit: BoxFit.contain,
@@ -211,7 +222,7 @@ class _WelcomeStep extends StatelessWidget {
           ),
           Positioned(
             left: 20,
-            top: 473,
+            top: 510,
             width: 390,
             child: Column(
               children: [
@@ -299,6 +310,39 @@ class _ChoiceStep extends StatelessWidget {
   }
 }
 
+class _WelcomeMascotGlow extends StatelessWidget {
+  const _WelcomeMascotGlow();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Stack(
+      fit: StackFit.expand,
+      children: [
+        DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Color(0x18507EFF), Color(0x28507EFF), Color(0x00507EFF)],
+              stops: [0, 0.52, 1],
+            ),
+          ),
+        ),
+        DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: RadialGradient(
+              center: Alignment(0, -0.02),
+              radius: 0.72,
+              colors: [Color(0x40507EFF), Color(0x00507EFF)],
+              stops: [0, 1],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _ProfileChoice {
   const _ProfileChoice(this.emoji, this.label);
 
@@ -340,7 +384,7 @@ class _ProfileChoiceCard extends StatelessWidget {
               children: [
                 const SizedBox(width: 16),
                 SizedBox(
-                  width: 28,
+                  width: 42,
                   child: Text(
                     choice.emoji,
                     style: const TextStyle(fontSize: 22),
@@ -388,10 +432,10 @@ class _ExperienceStep extends StatelessWidget {
             ),
           ),
           const Positioned(
-            left: 100,
-            top: 250,
-            width: 230,
-            height: 220,
+            left: 75,
+            top: 230,
+            width: 280,
+            height: 260,
             child: _ProfileIllustration(
               assetPath: 'assets/images/profile/experience_mascot.png',
               fit: BoxFit.contain,
@@ -399,7 +443,7 @@ class _ExperienceStep extends StatelessWidget {
           ),
           Positioned(
             left: 20,
-            top: 489,
+            top: 515,
             width: 390,
             child: Column(
               children: [
@@ -632,6 +676,7 @@ class _PythonCourseArtwork extends StatelessWidget {
       child: Image.asset(
         'assets/images/profile/python_course.png',
         fit: BoxFit.cover,
+        cacheWidth: 780,
       ),
     );
   }
@@ -678,10 +723,10 @@ class _DailyTimeStep extends StatelessWidget {
             ),
           ),
           const Positioned(
-            left: 105,
-            top: 300,
-            width: 220,
-            height: 230,
+            left: 75,
+            top: 280,
+            width: 280,
+            height: 270,
             child: _ProfileIllustration(
               assetPath: 'assets/images/profile/study_mascot.png',
               fit: BoxFit.contain,
@@ -812,10 +857,10 @@ class _PreparingStep extends StatelessWidget {
       body: Stack(
         children: [
           const Positioned(
-            left: 100,
-            top: 315,
-            width: 230,
-            height: 230,
+            left: 70,
+            top: 285,
+            width: 290,
+            height: 280,
             child: _ProfileIllustration(
               assetPath: 'assets/images/profile/meditation_mascot.png',
               fit: BoxFit.contain,
@@ -848,7 +893,9 @@ class _ProfileIllustration extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ExcludeSemantics(child: Image.asset(assetPath, fit: fit));
+    return ExcludeSemantics(
+      child: Image.asset(assetPath, fit: fit, cacheWidth: 600),
+    );
   }
 }
 
@@ -872,140 +919,153 @@ class _RegistrationStepState extends State<_RegistrationStep> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      clipBehavior: Clip.hardEdge,
-      children: [
-        const AppBrandBackdrop(),
-        const Positioned(
-          left: 39.82,
-          top: 52,
-          width: 350.4,
-          height: 345,
-          child: Image(
-            image: AssetImage('assets/images/auth/login_mascot.png'),
-            fit: BoxFit.contain,
-          ),
-        ),
-        const Positioned(
-          left: 0,
-          right: 0,
-          bottom: 0,
-          height: 575,
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: AppRadius.sheetTop,
-              boxShadow: AppShadows.elevatedCard,
+    return AppKeyboardScrollView(
+      key: const ValueKey('registration-page-scroll'),
+      child: SizedBox(
+        height: 932,
+        child: Stack(
+          clipBehavior: Clip.hardEdge,
+          children: [
+            const AppBrandBackdrop(),
+            Positioned(
+              left: 39.82,
+              top: 52,
+              width: 350.4,
+              height: 345,
+              child: Image.asset(
+                'assets/images/auth/login_mascot.png',
+                fit: BoxFit.contain,
+                cacheWidth: 600,
+              ),
             ),
-          ),
-        ),
-        const Positioned(
-          left: 286.5,
-          top: 138,
-          width: 25.51,
-          height: 20.5,
-          child: _SpeechTail(),
-        ),
-        Positioned(
-          left: 293,
-          top: 94,
-          child: DecoratedBox(
-            decoration: const BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: AppRadius.lessonCard,
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(15),
-              child: Text(
-                'Salom!',
-                style: AppTypography.headline.copyWith(
-                  fontWeight: FontWeight.w600,
-                  height: 30 / 24,
+            const Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              height: 575,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: AppRadius.sheetTop,
+                  boxShadow: AppShadows.elevatedCard,
                 ),
               ),
             ),
-          ),
+            const Positioned(
+              left: 286.5,
+              top: 138,
+              width: 25.51,
+              height: 20.5,
+              child: _SpeechTail(),
+            ),
+            Positioned(
+              left: 293,
+              top: 94,
+              child: DecoratedBox(
+                decoration: const BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: AppRadius.lessonCard,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(15),
+                  child: Text(
+                    'Salom!',
+                    style: AppTypography.headline.copyWith(
+                      fontWeight: FontWeight.w600,
+                      height: 30 / 24,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              left: 20,
+              top: 382,
+              width: 390,
+              child: Column(
+                children: [
+                  Text(
+                    'Xush kelibsiz! 👋',
+                    style: AppTypography.title.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.compact),
+                  Text(
+                    'Davom etish uchun ro’yxatdan o’ting',
+                    style: AppTypography.bodySmall.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.section),
+                  const AppTextField(
+                    hintText: 'Ismingiz',
+                    prefixIcon: Icon(
+                      Icons.person_outline_rounded,
+                      color: AppColors.textSecondary,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.medium),
+                  AppTextField(
+                    hintText: 'Email',
+                    keyboardType: TextInputType.emailAddress,
+                    prefixIcon: SvgPicture.asset('assets/icons/auth/email.svg'),
+                  ),
+                  const SizedBox(height: AppSpacing.medium),
+                  AppTextField(
+                    hintText: 'Parol',
+                    obscureText: _obscurePassword,
+                    prefixIcon: SvgPicture.asset(
+                      'assets/icons/auth/password.svg',
+                    ),
+                    suffixIcon: _PasswordVisibilityIcon(
+                      obscure: _obscurePassword,
+                    ),
+                    onSuffixPressed: () =>
+                        setState(() => _obscurePassword = !_obscurePassword),
+                  ),
+                  const SizedBox(height: AppSpacing.medium),
+                  AppTextField(
+                    hintText: 'Parolni qayta tering',
+                    obscureText: _obscureConfirmation,
+                    prefixIcon: SvgPicture.asset(
+                      'assets/icons/auth/password.svg',
+                    ),
+                    suffixIcon: _PasswordVisibilityIcon(
+                      obscure: _obscureConfirmation,
+                    ),
+                    onSuffixPressed: () => setState(
+                      () => _obscureConfirmation = !_obscureConfirmation,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.section),
+                  AppButton(
+                    label: 'Ro’yxatdan o’tish',
+                    onPressed: widget.onProfileCreated,
+                  ),
+                  const SizedBox(height: AppSpacing.section),
+                  const _RegistrationDivider(),
+                  const SizedBox(height: AppSpacing.section),
+                  AppButton(
+                    label: 'Google orqali',
+                    onPressed: widget.onProfileCreated,
+                    variant: AppButtonVariant.outlined,
+                    contentGap: 12,
+                    leading: SvgPicture.asset(
+                      'assets/icons/auth/google.svg',
+                      width: 20,
+                      height: 20,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.section),
+                  _LoginPrompt(onPressed: widget.onLogin),
+                ],
+              ),
+            ),
+          ],
         ),
-        Positioned(
-          left: 20,
-          top: 382,
-          width: 390,
-          child: Column(
-            children: [
-              Text(
-                'Xush kelibsiz! 👋',
-                style: AppTypography.title.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.compact),
-              Text(
-                'Davom etish uchun ro’yxatdan o’ting',
-                style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textSecondary,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.section),
-              const AppTextField(
-                hintText: 'Ismingiz',
-                prefixIcon: Icon(
-                  Icons.person_outline_rounded,
-                  color: AppColors.textSecondary,
-                  size: 20,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.medium),
-              AppTextField(
-                hintText: 'Email',
-                keyboardType: TextInputType.emailAddress,
-                prefixIcon: SvgPicture.asset('assets/icons/auth/email.svg'),
-              ),
-              const SizedBox(height: AppSpacing.medium),
-              AppTextField(
-                hintText: 'Parol',
-                obscureText: _obscurePassword,
-                prefixIcon: SvgPicture.asset('assets/icons/auth/password.svg'),
-                suffixIcon: _PasswordVisibilityIcon(obscure: _obscurePassword),
-                onSuffixPressed: () =>
-                    setState(() => _obscurePassword = !_obscurePassword),
-              ),
-              const SizedBox(height: AppSpacing.medium),
-              AppTextField(
-                hintText: 'Parolni qayta tering',
-                obscureText: _obscureConfirmation,
-                prefixIcon: SvgPicture.asset('assets/icons/auth/password.svg'),
-                suffixIcon: _PasswordVisibilityIcon(
-                  obscure: _obscureConfirmation,
-                ),
-                onSuffixPressed: () => setState(
-                  () => _obscureConfirmation = !_obscureConfirmation,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.section),
-              AppButton(
-                label: 'Ro’yxatdan o’tish',
-                onPressed: widget.onProfileCreated,
-              ),
-              const SizedBox(height: AppSpacing.section),
-              const _RegistrationDivider(),
-              const SizedBox(height: AppSpacing.section),
-              AppButton(
-                label: 'Google orqali',
-                onPressed: widget.onProfileCreated,
-                variant: AppButtonVariant.outlined,
-                contentGap: 12,
-                leading: SvgPicture.asset(
-                  'assets/icons/auth/google.svg',
-                  width: 20,
-                  height: 20,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.section),
-              _LoginPrompt(onPressed: widget.onLogin),
-            ],
-          ),
-        ),
-      ],
+      ),
     );
   }
 }

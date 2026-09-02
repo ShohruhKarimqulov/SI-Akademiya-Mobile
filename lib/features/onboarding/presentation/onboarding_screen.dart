@@ -54,7 +54,10 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     _didPrecacheMascots = true;
     Future.wait([
       for (final page in _pages)
-        precacheImage(AssetImage(page.assetPath), context),
+        precacheImage(
+          ResizeImage(AssetImage(page.assetPath), width: 600),
+          context,
+        ),
       precacheImage(
         const AssetImage('assets/icons/actions/arrow-right-light@4x.png'),
         context,
@@ -543,7 +546,11 @@ class _OnboardingIllustration extends StatelessWidget {
                   children: [
                     Positioned.fromRect(
                       rect: data.imageRect,
-                      child: Image.asset(data.assetPath, fit: BoxFit.fill),
+                      child: Image.asset(
+                        data.assetPath,
+                        fit: BoxFit.fill,
+                        cacheWidth: 600,
+                      ),
                     ),
                   ],
                 ),
